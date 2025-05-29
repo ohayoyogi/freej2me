@@ -924,20 +924,15 @@ public final class SMAFDecoder
             else // Mobile Standard formats (with or without compression, as this method will receive uncompressed data either way)
             {
                 //duration = getVariableLengthValue(data, new int[]{offset});
-                int numBytes = 0;
                 // In Mobile Standard, both duration and gateTime use the variable length notation, up to 4 bytes
                 // TODO: We might need to do more stuff here (handy phone format has an increment if more than one byte is used for example)...
+                duration = 0;
                 for (int i = 0; i < 4; i++) 
-                {
-                    
+                {                    
                     byte currentByte = data[offset++]; // Read the current byte
-                    duration = (i > 0 ? ((duration & 0x3F) | (currentByte & 0x7F)) : currentByte);
-                    duration += (numBytes << 7);
-
-                    numBytes++;
+                    duration = (duration << 7) + (currentByte & 0x7F);
                     // Check if the MSB is 0 to determine if this is the last byte
                     if ((currentByte & 0x80) == 0) { break; }
-                    
                 }
 
                 totalDuration += (duration * timeBasetoMs(TimeBase_D)); // Update total duration
@@ -981,14 +976,12 @@ public final class SMAFDecoder
                         case 0x80: // Note without velocity
                             channel = (byte) (status & 0x0F);
                             noteNumber = (byte) (data[offset++] & 0x7F); // Note Number
-                            numBytes = 0;
                             // Read gate time
+                            gateTime = 0;
                             for (int i = 0; i < 4; i++) 
-                            {            
+                            {
                                 byte currentByte = data[offset++]; // Read the current byte
-                                gateTime = (i > 0 ? ((gateTime & 0x3F) | (currentByte & 0x7F)) : currentByte);
-                                gateTime += (numBytes << 7);
-                                numBytes++;
+                                gateTime = (gateTime << 7) + (currentByte & 0x7F);
                                 // Check if the MSB is 0 to determine if this is the last byte
                                 if ((currentByte & 0x80) == 0) { break; }
                             }
@@ -1022,14 +1015,12 @@ public final class SMAFDecoder
                             channel = (byte) (status & 0x0F);
                             noteNumber = (byte) (data[offset++] & 0x7F); // Note Number
                             channelData[channel].velocity = (byte) (data[offset++] & 0x7F); // Key Velocity
-                            numBytes = 0;
                             // Read gate time
+                            gateTime = 0;
                             for (int i = 0; i < 4; i++) 
                             {
                                 byte currentByte = data[offset++]; // Read the current byte
-                                gateTime = (i > 0 ? ((gateTime & 0x3F) | (currentByte & 0x7F)) : currentByte);
-                                gateTime += (numBytes << 7);
-                                numBytes++;
+                                gateTime = (gateTime << 7) + (currentByte & 0x7F);
                                 // Check if the MSB is 0 to determine if this is the last byte
                                 if ((currentByte & 0x80) == 0) { break; }
                             }
