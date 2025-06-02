@@ -216,7 +216,7 @@ public class Display
 
 	public void setCurrent(Displayable next)
 	{
-		setCurrentRequest = (() -> 
+		Runnable tmpSetCurrentRequest = (() -> 
 		{
 			Displayable prev;
 			if (next == null || current == next) { return; }
@@ -252,6 +252,12 @@ public class Display
 			}
 			finally { Mobile.displayUpdated = true; }
 		});
+
+		if (!Mobile.compatImmediateRepaints) {
+			this.setCurrentRequest = tmpSetCurrentRequest;
+		} else {
+			tmpSetCurrentRequest.run();
+		}
 	}
 
 	public void setCurrent(Alert alert, Displayable next)

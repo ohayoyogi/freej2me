@@ -158,7 +158,6 @@ public abstract class Canvas extends Displayable
 			}
 		}
 		else {
-			Mobile.getDisplay().processPaintsNow();
 			repaintRequest(x, y, width, height); 
 		}
 	}
@@ -223,7 +222,7 @@ public abstract class Canvas extends Displayable
 	}
 
 	public int getHeight() 
-	{ 
+	{
 		return height - ((!fullscreen && !commands.isEmpty()) ? barHeight : 0);
 	}
 
